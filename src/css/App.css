@@ -1,0 +1,66 @@
+.container {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.addInput {
+  margin: auto;
+  width: 570px;
+}
+
+.buttonX {
+  margin: 0 0 0 10px;
+  opacity: 0.9;
+}
+
+.buttonXAdd {
+  display: inline;
+}
+
+.addTask {
+  margin: 0 0 25px 0;
+}
+
+.addTaskForm {
+  display: inline;
+}
+
+.taskText {
+  margin-bottom: 18px;
+}
+
+.searchBar {
+  margin: 10px 0 0 0;
+}
+
+.subTasks {
+  text-align: left;
+  padding-left: 38%;
+  margin-bottom: 0.9em;
+}
+
+.subtaskItem {
+  zoom: 0.9;
+}
+
+.subtaskItem:hover img {
+  visibility: visible;
+}
+
+.subtaskIcon {
+  zoom: 0.34;
+  cursor: pointer;
+  opacity: 0.55;
+  visibility: hidden;
+  vertical-align: middle;
+  padding: 5px;
+}
+
+.subtaskIcon:last-child {
+  margin-left: 30px;
+}
+
+.subtaskIcon:hover {
+  opacity: 1;
+  transition: all 0.2s linear;
+}
