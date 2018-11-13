@@ -17,9 +17,38 @@ class Task extends Component {
     super(props);
     this.state = {
       edit: false,
-      editedText: props.task.text
+      escape: false,
+      editedText: props.task.text,
+      addSubtask: false,
+      newSubtaskText: ""
     };
   }
+
+  addSubtask = () => {
+    this.setState({
+      addSubtask: true
+    });
+  };
+
+  handleKeyUpAddSubtask = e => {
+    if (e.keyCode === 13) {
+      this.saveNewSubtask();
+    }
+  };
+
+  saveNewSubtask = () => {
+    const { task, onAddSubtask } = this.props;
+    this.setState({
+      addSubtask: false
+    });
+    onAddSubtask(task.id, this.state.newSubtaskText);
+  };
+
+  handleChangeAddSubtask = e => {
+    this.setState({
+      newSubtaskText: e.target.value
+    });
+  };
 
   editTask = () => {
     this.setState({
@@ -30,10 +59,14 @@ class Task extends Component {
   handleKeyUp = e => {
     if (e.keyCode === 13) {
       this.saveTask();
+    } else if (e.keyCode === 27) {
+      this.setState({
+        escape: true
+      });
     }
   };
 
-  handleChange = e => {
+  handleChangeEdit = e => {
     this.setState({
       editedText: e.target.value
     });
@@ -69,12 +102,25 @@ class Task extends Component {
                 <div className="addTaskForm">
                   <TextField
                     className={classes.textFieldStyles}
-                    onChange={this.handleChange}
+                    onChange={this.handleChangeEdit}
                     onKeyUp={this.handleKeyUp}
                     value={this.state.editedText}
                     autoComplete="off"
                     id="standard-with-placeholder"
                     label="Edit task"
+                    margin="normal"
+                  />
+                </div>
+              ) : this.state.addSubtask ? (
+                <div className="addTaskForm">
+                  <TextField
+                    className={classes.textFieldStyles}
+                    onChange={this.handleChangeAddSubtask}
+                    onKeyUp={this.handleKeyUpAddSubtask}
+                    value={this.state.newSubtaskText}
+                    autoComplete="off"
+                    id="standard-with-placeholder"
+                    label="Add subtask"
                     margin="normal"
                   />
                 </div>
@@ -112,6 +158,18 @@ class Task extends Component {
                   >
                     <SaveIcon />
                     Save
+                  </Button>
+                </span>
+              ) : this.state.addSubtask ? (
+                <span className="buttonX">
+                  <Button
+                    mini
+                    variant="contained"
+                    size="small"
+                    onClick={this.saveNewSubtask}
+                  >
+                    <SaveIcon />
+                    Add
                   </Button>
                 </span>
               ) : (

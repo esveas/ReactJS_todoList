@@ -60,26 +60,20 @@ class App extends Component {
     };
   }
 
-  // componentDidMount() {
-  //   this.setState({
-  //     taskArray: JSON.parse(localStorage.getItem("taskArray"))
-  //   });
-  // }
-
-  addTask = () => {
-    let newTask = {
-      id: this.state.taskArray.length + 1,
-      text: this.state.newTaskText,
-      done: false
-    };
+  componentDidMount() {
     this.setState({
-      taskArray: [newTask, ...this.state.taskArray],
-      newTaskText: ""
+      taskArray: JSON.parse(localStorage.getItem("taskArray")) || []
     });
-    // localStorage.setItem(
-    //   "taskArray",
-    //   JSON.stringify([newTask, ...this.state.taskArray])
-    // );
+  }
+
+  handleChangeTab = (e, filter) => {
+    this.setState({ filter });
+  };
+
+  onSearch = e => {
+    this.setState({
+      searchText: e.toLowerCase()
+    });
   };
 
   handleChange = e => {
@@ -88,32 +82,43 @@ class App extends Component {
     });
   };
 
+  handleKeyUp = e => {
+    if (e.keyCode === 13) {
+      this.addTask();
+    }
+  };
+
+  addTask = () => {
+    let newTask = {
+      id: this.state.taskArray.length + 1,
+      text: this.state.newTaskText,
+      subTask: [],
+      done: false
+    };
+    this.setState({
+      taskArray: [newTask, ...this.state.taskArray],
+      newTaskText: ""
+    });
+    localStorage.setItem(
+      "taskArray",
+      JSON.stringify([newTask, ...this.state.taskArray])
+    );
+  };
+
   deleteTask = id => {
     this.setState({
       taskArray: this.state.taskArray.filter(task => {
         return task.id !== id;
       })
     });
-    // localStorage.setItem(
-    //   "taskArray",
-    //   JSON.stringify(
-    //     this.state.taskArray.filter(task => {
-    //       return task.id !== id;
-    //     })
-    //   )
-    // );
-  };
-
-  onDeleteSubtask = (taskId, subtaskId) => {
-    this.setState({
-      taskArray: this.state.taskArray.map(task => {
-        return taskId === task.id
-          ? task.subTask.filter(subtaskItem => {
-              return subtaskId !== subtaskItem.id;
-            })
-          : task;
-      })
-    });
+    localStorage.setItem(
+      "taskArray",
+      JSON.stringify(
+        this.state.taskArray.filter(task => {
+          return task.id !== id;
+        })
+      )
+    );
   };
 
   editTask = (id, text) => {
@@ -122,14 +127,94 @@ class App extends Component {
         return task.id === id ? { ...task, text } : task;
       })
     });
-    // localStorage.setItem(
-    //   "taskArray",
-    //   JSON.stringify(
-    //     this.state.taskArray.map(task => {
-    //       return task.id === id ? { ...task, text } : task;
-    //     })
-    //   )
-    // );
+    localStorage.setItem(
+      "taskArray",
+      JSON.stringify(
+        this.state.taskArray.map(task => {
+          return task.id === id ? { ...task, text } : task;
+        })
+      )
+    );
+  };
+
+  updateMainCheckbox = (id, done) => {
+    this.setState({
+      taskArray: this.state.taskArray.map(task => {
+        return task.id === id ? { ...task, done } : task;
+      })
+    });
+    localStorage.setItem(
+      "taskArray",
+      JSON.stringify(
+        this.state.taskArray.map(task => {
+          return task.id === id ? { ...task, done } : task;
+        })
+      )
+    );
+  };
+
+  onAddSubtask = (taskId, newSubtaskText) => {
+    let currentTask = this.state.taskArray.find(task => {
+      return taskId === task.id;
+    });
+    let newSubTask = {
+      id: currentTask.subTask.length + 1,
+      subText: newSubtaskText,
+      done: false
+    };
+    this.setState({
+      taskArray: this.state.taskArray.map(task => {
+        return taskId === task.id
+          ? {
+              ...task,
+              subTask: [...task.subTask, newSubTask]
+            }
+          : task;
+      })
+    });
+    localStorage.setItem(
+      "taskArray",
+      JSON.stringify(
+        this.state.taskArray.map(task => {
+          return taskId === task.id
+            ? {
+                ...task,
+                subTask: [...task.subTask, newSubTask]
+              }
+            : task;
+        })
+      )
+    );
+  };
+
+  onDeleteSubtask = (taskId, subtaskId) => {
+    this.setState({
+      taskArray: this.state.taskArray.map(task => {
+        return taskId === task.id
+          ? {
+              ...task,
+              subTask: task.subTask.filter(subtaskItem => {
+                return subtaskId !== subtaskItem.id;
+              })
+            }
+          : task;
+      })
+    });
+    localStorage.setItem(
+      "taskArray",
+      JSON.stringify(
+        this.state.taskArray.map(task => {
+          return taskId === task.id
+            ? {
+                ...task,
+                subTask: task.subTask.filter(subtaskItem => {
+                  return subtaskId !== subtaskItem.id;
+                })
+              }
+            : task;
+        })
+      )
+    );
   };
 
   editSubtask = (taskId, subtaskId, subText) => {
@@ -145,36 +230,21 @@ class App extends Component {
           : task;
       })
     });
-
-    // this.setState({
-    //   taskArray: this.state.taskArray.map(task => {
-    //     return task.id === id ? { ...task, subText } : task;
-    //   })
-    // });
-    // localStorage.setItem(
-    //   "taskArray",
-    //   JSON.stringify(
-    //     this.state.taskArray.map(task => {
-    //       return task.id === id ? { ...task, text } : task;
-    //     })
-    //   )
-    // );
-  };
-
-  updateMainCheckbox = (id, done) => {
-    this.setState({
-      taskArray: this.state.taskArray.map(task => {
-        return task.id === id ? { ...task, done } : task;
-      })
-    });
-    // localStorage.setItem(
-    //   "taskArray",
-    //   JSON.stringify(
-    //     this.state.taskArray.map(task => {
-    //       return task.id === id ? { ...task, done } : task;
-    //     })
-    //   )
-    // );
+    localStorage.setItem(
+      "taskArray",
+      JSON.stringify(
+        this.state.taskArray.map(task => {
+          return task.id === taskId
+            ? {
+                ...task,
+                subTask: task.subTask.map(item => {
+                  return item.id === subtaskId ? { ...item, subText } : item;
+                })
+              }
+            : task;
+        })
+      )
+    );
   };
 
   updateSubtaskCheckbox = (taskId, subtaskId, done) => {
@@ -190,34 +260,21 @@ class App extends Component {
           : task;
       })
     });
-    // localStorage.setItem(
-    //   "taskArray",
-    //   JSON.stringify(
-    //     this.state.taskArray.map(task => {
-    //       return task.id === taskId
-    //         ? task.subTask.map(item => {
-    //             return item.id === subtaskId ? { ...item, done } : item;
-    //           })
-    //         : task;
-    //     })
-    //   )
-    // );
-  };
-
-  handleKeyUp = e => {
-    if (e.keyCode === 13) {
-      this.addTask();
-    }
-  };
-
-  handleChangeTab = (e, filter) => {
-    this.setState({ filter });
-  };
-
-  onSearch = e => {
-    this.setState({
-      searchText: e.toLowerCase()
-    });
+    localStorage.setItem(
+      "taskArray",
+      JSON.stringify(
+        this.state.taskArray.map(task => {
+          return task.id === taskId
+            ? {
+                ...task,
+                subTask: task.subTask.map(item => {
+                  return item.id === subtaskId ? { ...item, done } : item;
+                })
+              }
+            : task;
+        })
+      )
+    );
   };
 
   render() {
@@ -283,34 +340,38 @@ class App extends Component {
             </div>
           </div>
           {/* //Tasks */}
-          {this.state.taskArray
-            .filter(
-              task =>
+          {this.state.taskArray.length ? (
+            this.state.taskArray
+              .filter(task =>
                 filter === "all"
                   ? task
                   : filter === "relevant"
-                    ? task.done === false
-                    : task.done === true
-            )
-            // .filter(
-            //   task =>
-            //     task.text.toLowerCase().search(this.state.searchText) !== -1
-            // )
-            .map(item => {
-              return (
-                <Task
-                  key={item.id}
-                  task={item}
-                  onDelete={this.deleteTask}
-                  onDeleteSubtask={this.onDeleteSubtask}
-                  onEdit={this.editTask}
-                  onEditSubtask={this.editSubtask}
-                  isMainChecked={this.updateMainCheckbox}
-                  isSubtaskChecked={this.updateSubtaskCheckbox}
-                  classes={classes}
-                />
-              );
-            })}
+                  ? task.done === false
+                  : task.done === true
+              )
+              .filter(
+                task =>
+                  task.text.toLowerCase().search(this.state.searchText) !== -1
+              )
+              .map(item => {
+                return (
+                  <Task
+                    key={item.id}
+                    task={item}
+                    onDelete={this.deleteTask}
+                    onDeleteSubtask={this.onDeleteSubtask}
+                    onEdit={this.editTask}
+                    onEditSubtask={this.editSubtask}
+                    onAddSubtask={this.onAddSubtask}
+                    isMainChecked={this.updateMainCheckbox}
+                    isSubtaskChecked={this.updateSubtaskCheckbox}
+                    classes={classes}
+                  />
+                );
+              })
+          ) : (
+            <h5>You have empty todo list</h5>
+          )}
         </div>
       </div>
     );
